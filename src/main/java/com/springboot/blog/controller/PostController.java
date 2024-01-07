@@ -35,4 +35,9 @@ public class PostController {
         return ResponseEntity.ok(postService.getPostById(id));
     }
 
+    //update post by ID REST API
+    @PutMapping("/{id}")
+    public ResponseEntity<PostDto> updatePost(@RequestBody PostDto postDto, @PathVariable(name = "id") long id) {
+        return new ResponseEntity<>(postService.updatePost(postDto,id), HttpStatus.OK);
+    }
 }
