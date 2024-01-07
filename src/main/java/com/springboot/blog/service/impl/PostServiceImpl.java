@@ -6,6 +6,9 @@ import com.springboot.blog.repository.PostRepository;
 import com.springboot.blog.service.PostService;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 public class PostServiceImpl implements PostService {
 
@@ -16,22 +19,38 @@ public class PostServiceImpl implements PostService {
     }
     @Override
     public PostDto createPost(PostDto postDto) {
-        // convert DTO to entity
-        Post post = new Post();
-        post.setTitle(postDto.getTitle());
-        post.setDescription(postDto.getDescription());
-        post.setContent(postDto.getContent());
+        // convert DTO to entity by calling mapToEntity() method
+        Post post = mapToEntity(postDto);
 
         // save entity which returns an entity object which is saved
         Post newPost = postRepository.save(post);
 
-        // convert response entity to DTO
-        PostDto postResponse = new PostDto();
-        postResponse.setId(newPost.getId());
-        postResponse.setContent(newPost.getContent());
-        postResponse.setDescription((newPost.getDescription()));
-        postResponse.setTitle(newPost.getTitle());
+        // convert response entity to DTO by calling mapToDto() method
+        return mapToDto(newPost);
+    }
 
+    @Override
+    public List<PostDto> getAllPosts() {
+        List<Post> posts = postRepository.findAll();
+        return posts.stream().map(this::mapToDto).collect(Collectors.toList());
+    }
+
+    // converts entity obj to DTO
+    private PostDto mapToDto(Post post) {
+        PostDto postResponse = new PostDto();
+        postResponse.setId(post.getId());
+        postResponse.setContent(post.getContent());
+        postResponse.setDescription((post.getDescription()));
+        postResponse.setTitle(post.getTitle());
         return postResponse;
+    }
+
+    // convert DTO obj to entity obj
+    private Post mapToEntity(PostDto postDto) {
+        Post post = new Post();
+        post.setTitle(postDto.getTitle());
+        post.setDescription(postDto.getDescription());
+        post.setContent(postDto.getContent());
+        return post;
     }
 }
